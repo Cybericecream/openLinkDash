@@ -1,0 +1,33 @@
+version: "3.9"
+
+networks:
+  open-link-dash-network:
+    name: open-link-dash-network
+
+services:
+  proxy:
+    container_name: open_link_dash_proxy
+    volumes:
+      - ./docker/development/configs/proxy.conf:/etc/nginx/conf.d/portfolio.conf:ro
+    image: nginx:1.21
+    depends_on:
+      - open-link-dash
+    networks:
+      - open-link-dash-network
+    ports:
+      - "8080:80"
+    environment:
+      - NGINX_PORT=80
+
+  open-link-dash:
+    container_name: open_link_dash
+    working_dir: /app
+    volumes:
+      - .:/app
+    build:
+      context: .
+      dockerfile: docker/development/build/openLinkDash.Dockerfile
+    networks:
+      - open-link-dash-network
+    expose:
+      - 3000
